@@ -1,0 +1,61 @@
+﻿@page "/contacto"
+@page "/contacto/{id:int}"
+
+@using BlazorContactos.Shared.DTOS.Contactos;
+
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
+
+<h3>Contacto</h3>
+
+<EditForm Model="contacto" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="col-lg-12">
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <InputText id="Nombre" class="form-control" @bind-Value="@contacto.Nombre" />
+            <ValidationMessage For="@(() => contacto.Nombre)" />
+        </div>
+    </div>
+
+    <div class="col-1g-12 text-end mb-3 pt-4">
+        <hr />
+        <button type="button" class="btn btn-danger" onclick="history.back()">Cancelar</button>
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+
+</EditForm>
+
+
+@code {
+    protected ContactoDto contacto = new ContactoDto();
+    [Parameter] public int id { get; set; } = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id > 0)
+        {
+            var response = await httpClient.GetFromJsonAsync<ContactoDto>($"api/Contactos/{id}");
+            if (response != null)
+            {
+                contacto = response;
+            }
+        }
+    }
+
+    private async Task OnValidSubmit()
+    {
+        if (id > 0)
+        {
+            await httpClient.PutAsJsonAsync<ContactoDto>("api/Contactos", contacto);
+        }
+        else
+        {
+            await httpClient.PostAsJsonAsync<ContactoDto>("api/Contactos", contacto);
+        }
+
+        navigationManager.NavigateTo("contactos");
+    }
+
+}

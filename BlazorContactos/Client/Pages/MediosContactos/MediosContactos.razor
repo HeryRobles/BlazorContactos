@@ -1,0 +1,74 @@
+﻿@page "/mediosContactos"
+@using BlazorContactos.Shared.DTOS.MediosContactos
+
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
+
+
+<h3>Medios de Contactos</h3>
+
+<div class="row justify-content-end">
+    <div class="col-lg-3 text-end">
+        <button type="button" class="btn btn-success" @onclick=@(() => navigationManager.NavigateTo("mediosContacto"))>Agregar</button>
+    </div>
+</div>
+
+@if (mediosContactos == null)
+{
+    <h1>Cargando...</h1>
+}
+else if (mediosContactos.Count == 0)
+{
+    <h1>No se encontraron medios de contactos registrados...</h1>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table text-center table-hover">
+            <thead class="table-striped">
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Tipo de Contacto</th>
+                    <th scope="col">Contacto</th>
+                    <th scope="col">Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var mediosContacto in mediosContactos)
+                {
+                    <tr>
+                        <td>@mediosContacto.Id</td>
+                        <td>@mediosContacto.TipoContacto</td>
+                        <td>@mediosContacto.Contacto</td>
+
+                        <td>
+                            <button class="btn btn-primary" type="button" @onclick=@(() => navigationManager.NavigateTo($"mediosContactos/{mediosContacto.Id}"))>Editar</button>
+                            <button class="btn btn-danger" type="button" @onclick="@(() => Eliminar(mediosContacto))">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+}
+
+@code {
+    protected List<MediosContactoDto> mediosContactos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await httpClient.GetFromJsonAsync<List<MediosContactoDto>>("api/MediosContactos");
+        if (response != null)
+        {
+            mediosContactos = response;
+        }
+    }
+
+    protected async Task Eliminar(MediosContactoDto mediosContacto)
+    {
+        await httpClient.DeleteAsync($"api/MediosContactos/{mediosContacto.Id}");
+        mediosContactos.Remove(mediosContacto);
+    }
+
+}
