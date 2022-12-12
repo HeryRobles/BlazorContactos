@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlazorContactos.Server.Controllers
 {
-    [ApiController, Route("/[Controller]")]
+    [ApiController, Route("api/MediosContactos")]
     public class MediosContactosController : ControllerBase 
     {
         private readonly ApplicationDbContext context;
